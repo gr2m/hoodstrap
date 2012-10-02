@@ -1,40 +1,172 @@
-<!DOCTYPE HTML>
-<html lang="en-US">
-<head>
-  <meta charset="UTF-8">
-  <title>{{hoodie_appname}}</title>
-  <script type="text/javascript" src="/script/jquery-1.7.2.min.js"></script>
-  <script type="text/javascript" src="/script/hoodie.js"></script>
-  <script type="text/javascript">
-  var hoodie = new Hoodie("{{hoodie_api_url}}");
-  console.log("hello hoodie");
-  console.log(hoodie);
-  hoodie.request("GET", "/")
-  .done(function(data) {
-    console.log(data);
-  })
-  .fail(function(error) {
-    console.log(error);
-  });
-  </script>
-  <link rel="stylesheet" href="styles/main.css"/>
-</head>
-<body>
-  <div class="sidebar">
-    <div class="logo">
-      <img src="images/hoodie_logo.png" alt="">
+<!DOCTYPE html>
+<html class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Hoodstrap</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
+    <link rel="stylesheet" href="css/main.css">
+
+    <script src="js/vendor/modernizr-2.6.1.min.js"></script>
+  </head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">Hoodstrap</a>
+
+          <div id="hoodieAccountBar" class="hoodie-accountbar pull-right">
+            <div class="hoodie-signedout">
+              <a href="#hoodieAccountModal" data-toggle="modal" class="btn btn-small btn-inverse">
+                Sign In / Sign Up
+              </a>
+            </div><!-- /.hoodie-signed-out -->
+            <div class="hoodie-signedin">
+              Hello,
+              <span class="hoodie-username"><!-- usern name will be filled in here --></span>
+              <span class="btn-group">
+                <button class="hoodie-signout btn btn-small btn-inverse" data-hoodie-action="account-signout">Sign Out</button>
+                <button class="btn btn-small dropdown-toggle btn-inverse" data-toggle="dropdown">
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a href="#" class="hoodie-destroy" data-hoodie-action="account-change-password">Change Password</a></li>
+                  <li><a href="#" class="hoodie-change-username" data-hoodie-action="account-change-username">Change Username</a></li>
+                  <li><a href="#" class="hoodie-destroy" data-hoodie-action="account-destory">Destroy Account</a></li>
+                </ul>
+              </span>
+            </div><!-- /.hoodie-signed-out -->
+          </div><!--/hoodieAccountBar -->
+        </div>
+
+      </div>
     </div>
-  </div>
-  <div class="main welcome">
-    <div class="header">
-      <h1 class="title">{{hoodie_appname}}</h1>
-    </div>
-    <div class="body">
-      <h2>Welcome!</h2>
-      <p>Your Hoodie-app <strong>{{hoodie_appname}}</strong> is ready!</p>
-      <p>You can find <strong>{{hoodie_appname}}</strong>'s admin panel at <br><a href="">http://admin.{{hoodie_appname}}.hoodie.dev</a></p>
-      <a href="http://admin.{{hoodie_appname}}.hoodie.dev" class="button"><i class="icon-cog"></i>Open {{hoodie_appname}}'s admin panel</a>
-    </div>
-  </div>
-</body>
+
+    <div class="container">
+
+      <!-- Main hero unit for a primary marketing message or call to action -->
+      <div class="hero-unit">
+        <h1>Hoodstrap</h1>
+        <p>
+          hood.ie bootstrap modules
+        </p>
+      </div>
+
+      <hr>
+
+      <!-- magic hoodie modules -->
+      <div class="hoodie-store">
+        <h2>
+          hoodie.my.store
+          <small>(<a href="#" class="clear">clear</a>)</small>
+        </h2>
+        <table class="table hoodie-store table-condensed">
+          <thead>
+            <tr>
+              <th class="">type</th>
+              <th class="">#</th>
+              <th class="">rev</th>
+              <th class="">created at</th>
+              <th class="">updated at</th>
+              <th class="">synced at</th>
+              <th class="data">data</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+          </tbody>
+        </table>
+      </div>
+      <!-- /magic hoodie modules -->
+
+      <hr>
+
+      <!-- magic hoodie modules -->
+      <div class="hoodie-log">
+        <h2>
+          hoodie.log
+          <small>(<a href="#" class="clear">clear</a>)</small>
+        </h2>
+        <table class="table table-condensed">
+          <thead>
+            <tr>
+              <th class="">#</th>
+              <th class="">module</th>
+              <th class="">event</th>
+              <th class="data">data</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+          </tbody>
+        </table>
+      </div>
+      <!-- /magic hoodie modules -->
+      
+
+      <hr>
+
+      <footer>
+        <p>&hearts; hood.ie 2012</p>
+      </footer>
+    </div> <!-- /container -->
+
+    <div id="hoodieAccountModal" class="login modal hide fade">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">Sign in</h3>
+      </div>
+      <div class="modal-body">
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#hoodieAccountModalSignIn" data-toggle="tab">Sign In</a></li>
+          <li><a href="#hoodieAccountModalSignUp" data-toggle="tab">Sign Up</a></li>
+          <li><a href="#hoodieAccountModalRestPassword" data-toggle="tab">Forgot Password</a></li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="hoodieAccountModalSignIn">
+            <form class="hoodie-signin" data-hoodie-action="account-signin">
+              <input class="username span3" type="text" placeholder="Email"><br />
+              <input class="password span3" type="password" placeholder="Password">
+              <input type="submit" value="Sign in">
+            </form>
+          </div>
+          <div class="tab-pane" id="hoodieAccountModalSignUp">
+            <form class="hoodie-signup" data-hoodie-action="account-signup">
+              <input class="username span3" type="text" placeholder="Email"><br />
+              <input class="password span3" type="password" placeholder="Password"><br />
+              <input class="password_confirmation span3" type="password" placeholder="Password">
+              <input type="submit" value="Sign Up">
+            </form>
+          </div>
+          <div class="tab-pane" id="hoodieAccountModalRestPassword">
+            <form class="hoodie-resetpassword" data-hoodie-action="account-resetpassword">
+              <input class="email span3" type="text" placeholder="Email"><br />
+              <input type="submit" value="Reset Password">
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" data-action="signin">Sign in</button>
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+      </div>
+    </div><!-- /hoodieAccountModal -->
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.js"></script>
+    <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.8.1.js"><\/script>')</script>
+
+    <script src="js/vendor/bootstrap.js"></script>
+    <script src="js/vendor/hoodie.js"></script>
+    <script src="js/hoodie.accountbar.bootstrap.js"></script>
+    <script src="js/main.js"></script>
+  </body>
 </html>

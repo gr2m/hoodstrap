@@ -1,0 +1,39 @@
+
+
+/* ==========================================================================
+   Hoodie Sign In / Sign Up / Sign out stylings
+   ========================================================================== */
+
+.hoodie-accountbar {
+
+}
+
+/* hide contents until we know if user is signed in or not */
+.hoodie-accountbar > div {
+  display: none;
+}
+
+.hoodie-signedin  .hoodie-accountbar .hoodie-signedin,
+.hoodie-signedout .hoodie-accountbar .hoodie-signedout {
+  display: block;
+  padding: 10px 0;
+}
+
+#hoodieAccountModal form input[type=submit] {
+  position: absolute;
+  left: -9999px;
+}
+
+
+/* ==========================================================================
+   Hoodie Log
+   ========================================================================== */
+
+table th,
+table td {
+  white-space: nowrap;
+}
+table .data {
+  width: 100%;
+  white-space: pre;
+}
