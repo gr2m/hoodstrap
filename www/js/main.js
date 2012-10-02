@@ -1,7 +1,17 @@
 // hoodie = new Hoodie("http://api.hoodoo.hoodie.dev")
 // workaround due to current bug with couch being not accessible
 // via api.hoodoo.hoodie.dev
-hoodie = new Hoodie("http://localhost:9292/localhost:5984")
+
+baseUrl = localStorage.getItem('baseUrl') || "http://api.hoodstrap.hoodie.dev"
+$('#hoodieBaseUrl').val(baseUrl)
+hoodie  = new Hoodie(baseUrl)
+$('input#hoodieBaseUrl').change(function(event) {
+  $el = $(event.target)
+  localStorage.setItem('baseUrl', $el.val()) 
+  hoodie.my.account.signOut()
+  .done( function() { location.reload() })
+  .fail( function() { location.reload() })
+})
 
 $hoodieAccountModal = $('#hoodieAccountModal')
 $hoodieAccountModal.on('shown', function() {
