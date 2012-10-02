@@ -59,7 +59,7 @@ Hoodie.extend('hoodstrap', (function() {
             'store:update',
             'store:create',
             'store:clear',
-            'store:dirty:idle'
+            'store:idle'
           ]
 
       for (var i = 0; i < events.length; i++) {
@@ -73,7 +73,7 @@ Hoodie.extend('hoodstrap', (function() {
 
     // 
     _log: function(event) {
-      return function(data) {
+      return function(data, options) {
         var _ref, module, eventName, time, dataString;
 
         _ref       = event.split(/:/)
@@ -81,6 +81,7 @@ Hoodie.extend('hoodstrap', (function() {
         eventName  = [].slice.call(_ref, 1).join(':')
         time       = new Date().toTimeString().substring(0,8)
         dataString = this._humanizeData(data);
+        optionsTag = options ? '<td>' + this._humanizeData(options) + '</td>' : ''
 
         this.$hoodieLogBody.prepend('<tr><td>'+time+'</td><td>'+module+'</td><td>'+eventName+'</td><td class="data">'+dataString+'</td></tr>') 
       }.bind(this)
@@ -149,7 +150,7 @@ Hoodie.extend('hoodstrap', (function() {
 
       createdAt = createdAt ? createdAt.toISOString().substring(0,19).replace('T', ' ') : '-'
       updatedAt = updatedAt ? updatedAt.toISOString().substring(0,19).replace('T', ' ') : '-'
-      syncedAt  = syncedAt  ? syncedAt.toISOString().substring(0,19).replace('T', ' ') : '-'
+      syncedAt  =  syncedAt ?  syncedAt.toISOString().substring(0,19).replace('T', ' ') : '-'
       data      = this._humanizeData(properties)
 
       return '<tr id="'+html_id+'"><td>'+type+'</td><td>'+id+'</td><td>'+rev+'</td><td>'+createdAt+'</td><td>'+updatedAt+'</td><td>'+syncedAt+'</td><td class="data">'+data+'</td></tr>'  
@@ -160,8 +161,24 @@ Hoodie.extend('hoodstrap', (function() {
     },
 
     _humanizeData: function(data) {
-      if (typeof data === 'undefined') return '-'
-      return JSON.stringify(data, "", 2).replace(/(^\{\n|\n\}$|)/g, '').replace(/ *"([^"]+)":/g,'<strong>$1:</strong>').replace(/,\n/g, '\n')
+      switch (typeof data) {
+        case 'undefined':
+          return '<em>undefined</em>'
+        case 'string':
+        case 'number':
+        case 'boolean':
+          return data
+        case 'object':
+          if (Array.isArray(data)) {
+            return data.map(this._humanizeData).join(',')
+          } else {
+            var rows = []
+            for (var key in data) {
+              rows.push('<tr><th>' + key + ':</th><td>' + this._humanizeData(data[key]) + '</td></tr>')
+            }
+            return '<table>' + rows.join('') +  '</table>'
+          }
+      }
     }
   }
 

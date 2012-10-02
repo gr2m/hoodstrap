@@ -704,7 +704,7 @@ Hoodie.Store = (function() {
         promise = filterOrObjects;
         break;
       case $.isArray(filterOrObjects):
-        promise = this.hoodie.defer().resolve(filterOrObjects).resolve();
+        promise = this.hoodie.defer().resolve(filterOrObjects).promise();
         break;
       default:
         promise = this.findAll();
@@ -717,7 +717,7 @@ Hoodie.Store = (function() {
         _results = [];
         for (_i = 0, _len = objects.length; _i < _len; _i++) {
           object = objects[_i];
-          _results.push(this.update(object.type, object.id, objectUpdate, options));
+          _results.push(this.update(object.$type, object.id, objectUpdate, options));
         }
         return _results;
       }).call(_this);
@@ -786,7 +786,7 @@ Hoodie.Store = (function() {
       _results = [];
       for (_i = 0, _len = objects.length; _i < _len; _i++) {
         object = objects[_i];
-        _results.push(_this.destroy(object.type, object.id, options));
+        _results.push(_this.destroy(object.$type, object.id, options));
       }
       return _results;
     });
@@ -961,7 +961,7 @@ Hoodie.RemoteStore = (function(_super) {
   RemoteStore.prototype.disconnect = function() {
     var _ref, _ref1;
     this.connected = false;
-    this.hoodie.unbind('store:dirty:idle', this.push);
+    this.hoodie.unbind('store:idle', this.push);
     if ((_ref = this._pullRequest) != null) {
       _ref.abort();
     }
@@ -1020,8 +1020,8 @@ Hoodie.RemoteStore = (function(_super) {
 
   RemoteStore.prototype.sync = function(docs) {
     if (this.isContinuouslyPushing()) {
-      this.hoodie.unbind('store:dirty:idle', this.push);
-      this.hoodie.on('store:dirty:idle', this.push);
+      this.hoodie.unbind('store:idle', this.push);
+      this.hoodie.on('store:idle', this.push);
     }
     return this.push(docs).pipe(this.pull);
   };
@@ -1719,11 +1719,10 @@ Hoodie.LocalStore = (function(_super) {
       _this = this;
     key = "" + type + "/" + id;
     this._dirty[key] = object;
-    this.hoodie.trigger('store:dirty');
     timeout = 2000;
     window.clearTimeout(this._dirtyTimeout);
     return this._dirtyTimeout = window.setTimeout((function() {
-      return _this.hoodie.trigger('store:dirty:idle');
+      return _this.hoodie.trigger('store:idle');
     }), timeout);
   };
 
@@ -1860,11 +1859,11 @@ Hoodie.LocalStore = (function(_super) {
   LocalStore.prototype._dirty = {};
 
   LocalStore.prototype._isDirty = function(object) {
-    if (!object._$syncedAt) {
-      return true;
-    }
     if (!object.$updatedAt) {
       return false;
+    }
+    if (!object._$syncedAt) {
+      return true;
     }
     return object._$syncedAt.getTime() < object.$updatedAt.getTime();
   };

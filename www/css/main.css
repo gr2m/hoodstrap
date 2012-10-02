@@ -37,3 +37,17 @@ table .data {
   width: 100%;
   white-space: pre;
 }
+table .data table {
+  width: 100%;
+  margin: -4px -5px;
+}
+table .data table th {
+  min-width: 150px;
+}
+table .data table td {
+  width: 100%;
+}
+table .data table th,
+table .data table td {
+  border-top: 0;
+}
