@@ -48,7 +48,7 @@ Hoodie.extend('hoodstrap', (function() {
             'account:signup',
             'account:signout',
             'account:error:unauthenticated',
-            'account:passwordreset:success',
+            'account:passwordreset',
 
             'remote:error:server',
             'remote:destroy',
@@ -223,6 +223,7 @@ Hoodie.extend('hoodstrap', (function() {
         , action   = $form.data('hoodie-action')
         , username = $form.find('input.username').val()
         , password = $form.find('input.password').val()
+        , email    = $form.find('input.email').val()
 
       $form.find('.alert').remove()
       switch(action) {

@@ -16,7 +16,7 @@
   <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
-        <div class="container">
+        <div class="container-fluid">
           <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
@@ -39,8 +39,8 @@
                   <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                  <li><a href="#" class="hoodie-destroy" data-hoodie-action="account-change-password">Change Password</a></li>
-                  <li><a href="#" class="hoodie-change-username" data-hoodie-action="account-change-username">Change Username</a></li>
+                  <li><a href="#" class="hoodie-destroy" data-hoodie-action="account-changepassword">Change Password</a></li>
+                  <li><a href="#" class="hoodie-change-username" data-hoodie-action="account-changeusername">Change Username</a></li>
                   <li><a href="#" class="hoodie-destroy" data-hoodie-action="account-destory">Destroy Account</a></li>
                 </ul>
               </span>
@@ -51,7 +51,7 @@
       </div>
     </div>
 
-    <div class="container">
+    <div class="container-fluid">
 
       <!-- Main hero unit for a primary marketing message or call to action -->
       <div class="hero-unit">
@@ -66,7 +66,7 @@
       <div class="hoodie-baseurl">
         <h2>hoodie.baseUrl</h2>
 
-        <input id="hoodieBaseUrl" class="span8" />
+        <span id="hoodieBaseUrl"></span> (<a href="#" id="changeHoodieBaseUrl">change</a>)
       </div>
 
       <hr>
@@ -126,7 +126,7 @@
       <footer>
         <p>&hearts; hood.ie 2012</p>
       </footer>
-    </div> <!-- /container -->
+    </div> <!-- /.container-fluid -->
 
     <div id="hoodieAccountModal" class="login modal hide fade">
       <div class="modal-header">
@@ -169,7 +169,7 @@
       </div>
     </div><!-- /hoodieAccountModal -->
 
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.js"></script>
+    <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script> -->
     <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.8.1.js"><\/script>')</script>
 
     <script src="js/vendor/bootstrap.js"></script>

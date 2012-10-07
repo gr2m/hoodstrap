@@ -9,13 +9,19 @@
 }
 
 /* hide contents until we know if user is signed in or not */
-.hoodie-accountbar > div {
+body .hoodie-signedin,
+body .hoodie-signedout,
+.hoodie-signedin  .hoodie-signedout,
+.hoodie-signedout .hoodie-signedin {
   display: none;
 }
-
-.hoodie-signedin  .hoodie-accountbar .hoodie-signedin,
-.hoodie-signedout .hoodie-accountbar .hoodie-signedout {
+.hoodie-signedin  .hoodie-signedin,
+.hoodie-signedout .hoodie-signedout {
   display: block;
+}
+
+.hoodie-accountbar .hoodie-signedin,
+.hoodie-accountbar .hoodie-signedout {
   padding: 10px 0;
 }
 
