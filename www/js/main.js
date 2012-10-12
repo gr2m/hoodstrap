@@ -21,10 +21,6 @@ $hoodieAccountModal = $('#hoodieAccountModal')
   $hoodieAccountModal.find('.alert').remove()
   $hoodieAccountModal.find('input').val('')
 })
-.on('click', 'button[type=submit]', function() {
-  $hoodieAccountModal.find('form:visible').submit()
-  return false  
-});
 
 // 
 hoodie.my.account.on('signin signup passwordreset', function() {

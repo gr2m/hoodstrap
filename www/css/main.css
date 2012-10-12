@@ -9,25 +9,25 @@
 }
 
 /* hide contents until we know if user is signed in or not */
-body .hoodie-signedin,
-body .hoodie-signedout,
-.hoodie-signedin  .hoodie-signedout,
-.hoodie-signedout .hoodie-signedin {
+body .hoodie-account-signedin,
+body .hoodie-account-signedout,
+body .hoodie-account-error {
   display: none;
 }
-.hoodie-signedin  .hoodie-signedin,
-.hoodie-signedout .hoodie-signedout {
+
+html[data-hoodie-account-status=signedin]  .hoodie-account-signedin,
+html[data-hoodie-account-status=error]     .hoodie-account-error,
+html[data-hoodie-account-status=signedout] .hoodie-account-signedout {
   display: block;
 }
 
-.hoodie-accountbar .hoodie-signedin,
-.hoodie-accountbar .hoodie-signedout {
+.hoodie-accountbar .hoodie-account-signedin,
+.hoodie-accountbar .hoodie-account-signedout {
   padding: 10px 0;
 }
 
-#hoodieAccountModal form input[type=submit] {
-  position: absolute;
-  left: -9999px;
+#hoodieAccountModal form {
+  margin: 0;
 }
 
 

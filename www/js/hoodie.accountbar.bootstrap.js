@@ -25,17 +25,23 @@ Hoodie.extend('hoodstrap', (function() {
 
       this.hoodie.my.account.on('signin', this._handleUserAuthenticated.bind(this))
       this.hoodie.my.account.on('signout', this._handleUserUnauthenticated.bind(this))
+      this.hoodie.on('account:error:unauthenticated remote:error:unauthenticated', this._handleUserAuthenticationError.bind(this))
     },
 
     // 
     _handleUserAuthenticated: function(username) {
-      $('html').addClass('hoodie-signedin').removeClass('hoodie-signedout')
+      $('html').attr('data-hoodie-account-status', 'signedin')
       this.$hoodieAccountBar.find('.hoodie-username').text(username)
     },
 
     // 
-    _handleUserUnauthenticated: function(error) {
-      $('html').removeClass('hoodie-signedin').addClass('hoodie-signedout')
+    _handleUserUnauthenticated: function() {
+      $('html').attr('data-hoodie-account-status', 'signedout')
+    },
+    _handleUserAuthenticationError: function() {
+      alert("Authentication Error. Please Sign In again.")
+      this.$hoodieAccountBar.find('.hoodie-username').text(this.hoodie.my.account.username)
+      $('html').attr('data-hoodie-account-status', 'error')
     },
 
     // 
@@ -54,6 +60,7 @@ Hoodie.extend('hoodstrap', (function() {
             'remote:destroy',
             'remote:update',
             'remote:create',
+            'remote:error:unauthenticated',
 
             'store:destroy',
             'store:update',
@@ -67,8 +74,8 @@ Hoodie.extend('hoodstrap', (function() {
       }
 
       $('.hoodie-log').on('click', '.clear', function() {
-        $hoodieLogBody.html('')
-      })
+        this.$hoodieLogBody.html('')
+      }.bind(this))
     },
 
     // 
@@ -246,9 +253,22 @@ Hoodie.extend('hoodstrap', (function() {
           })
           break
         case 'account-changepassword':
-          //
+          hoodie.my.account.changePassword(null, password)
+          .done(function() { 
+            $form.find('.alert').remove()
+          })
+          .fail(function(error) { 
+            $form.prepend('<div class="alert alert-error"><strong>'+error.error+':</strong> '+error.reason+'</div>')
+          })
           break
         case 'account-changeusername':
+          hoodie.my.account.changeUsername(password, username)
+          .done(function() { 
+            $form.find('.alert').remove()
+          })
+          .fail(function(error) { 
+            $form.prepend('<div class="alert alert-error"><strong>'+error.error+':</strong> '+error.reason+'</div>')
+          })
           //
           break
         case 'account-resetpassword':
