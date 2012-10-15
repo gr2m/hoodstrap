@@ -1,16 +1,17 @@
-baseUrl = localStorage.getItem('baseUrl') || "http://localhost:9292/localhost:5984"
-// baseUrl = localStorage.getItem('baseUrl') || "http://api.hoodstrap.hoodie.dev"
+defaultHostname = location.origin.replace(location.hostname, 'api.' + location.hostname)
+baseUrl = localStorage.getItem('baseUrl') || defaultHostname
 $('#hoodieBaseUrl').text(baseUrl)
 
 hoodie  = new Hoodie(baseUrl)
 $('#changeHoodieBaseUrl').click(function(event) {
   $el = $(event.target)
 
-  localStorage.setItem('baseUrl', prompt("enter hoodie base URL", "http://localhost:9292/localhost:5984"))
+  localStorage.setItem('baseUrl', prompt("enter hoodie base URL", defaultHostname))
 
+  reload = function() { location.reload() };
   hoodie.my.account.signOut()
-  .done( location.reload )
-  .fail( location.reload )
+    .done( reload )
+    .fail( reload )
 })
 
 $hoodieAccountModal = $('#hoodieAccountModal')
