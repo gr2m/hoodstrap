@@ -1,4 +1,8 @@
-defaultHostname = location.origin.replace(location.hostname, 'api.' + location.hostname)
+origin = location.protocol + '//' + location.hostname
+defaultHostname = origin.replace(location.hostname, 'api.' + location.hostname)
+
+// debug for now, api.* throws errors
+defaultHostname = 'http://localhost:9292/localhost:5984'
 baseUrl = localStorage.getItem('baseUrl') || defaultHostname
 $('#hoodieBaseUrl').text(baseUrl)
 
