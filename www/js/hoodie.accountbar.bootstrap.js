@@ -167,7 +167,7 @@ Hoodie.extend('hoodstrap', (function() {
     // 
     _bootstrap: function(objects) {
       // add tab
-      this.$container.find('.stores.nav li:last-child').before('<li><a id="'+this.nameId+'Tab" href="#'+this.nameId+'" data-toggle="tab">'+this.name+'</a></li>')
+      this.$container.find('.stores.nav li:last-child').before('<li><a id="'+this.nameId+'Tab" href="#'+this.nameId+'" data-toggle="tab">'+this.name+' <span class="badge count">0</span></a></li>')
 
       // add table
       this.$container.find('.stores.tab-content').append(
@@ -202,6 +202,7 @@ Hoodie.extend('hoodstrap', (function() {
       }
       this.$storeBody.append(html)
       this.$container.find('#'+this.nameId+'Tab').tab('show')
+      this._updateCount()
       this._bindToStoreEvents()
     },
 
@@ -209,6 +210,7 @@ Hoodie.extend('hoodstrap', (function() {
     _bindToStoreEvents: function() {
       this.store.on('create', function(object) {
         this.$storeBody.append(this._objectToHtml(object))
+        console.log('create')
       }.bind(this))
       this.store.on('update', function(object) {
         this._getElementFor(object).replaceWith(this._objectToHtml(object))
@@ -216,9 +218,14 @@ Hoodie.extend('hoodstrap', (function() {
       this.store.on('destroy', function(object) {
         this._getElementFor(object).remove()
       }.bind(this))
+      this.store.on('change', this._updateCount.bind(this))
       this.store.on('clear', function(object) {
         this.$storeBody.html('')
       }.bind(this))
+    },
+
+    _updateCount: function() {
+      this.$container.find('.count').text( this.store.db.length() )
     },
 
     // 
