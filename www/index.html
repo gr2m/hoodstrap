@@ -64,46 +64,37 @@
       <div class="hero-unit">
         <h1>Hoodstrap</h1>
         <p>
-          hood.ie bootstrap modules
+          hoodified bootstrap modules
         </p>
       </div>
 
       <hr>
 
       <div class="hoodie-baseurl">
-        <h2>hoodie.baseUrl</h2>
+        <h2>Settings</h2>
 
-        <span id="hoodieBaseUrl"></span> (<a href="#" id="changeHoodieBaseUrl">change</a>)
+        <p>
+          <strong>hoodie.baseUrl</strong>: <span id="hoodieBaseUrl"></span> <a href="#" id="changeHoodieBaseUrl" class="icon-pencil"></a>
+        </p>
+        
       </div>
 
       <hr>
 
       <!-- magic hoodie modules -->
-      <div class="hoodie-store">
+      <div class="hoodie-stores">
         <h2>
-          hoodie.my.store
-          <small>(<a href="#" class="clear" data-hoodie-action="store-clear">clear</a>)</small>
+          Stores
         </h2>
-        <table class="table hoodie-store table-condensed">
-          <thead>
-            <tr>
-              <th class="">type</th>
-              <th class="">#</th>
-              <th class="">rev</th>
-              <th class="">created at</th>
-              <th class="">updated at</th>
-              <th class="">synced at</th>
-              <th class="data">data</th>
-            </tr>
-          </thead>
-          <tbody>
-            
-          </tbody>
-        </table>
 
-        <p>
-          <button class="btn" data-hoodie-action="store-create"><span class="icon-plus"></span> create</button>
-        </p>
+        <ul class="stores nav nav-tabs">
+          <li>
+            <button class="add-store btn btn-small"><i class="icon-plus"></i></button>
+          </li>
+        </ul>
+
+        <div class="stores tab-content">
+        </div>
       </div>
       <!-- /magic hoodie modules -->
 

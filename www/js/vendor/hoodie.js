@@ -870,9 +870,15 @@ Hoodie.RemoteStore = (function(_super) {
     if (options == null) {
       options = {};
     }
+    this._mapDocsFromFindAll = __bind(this._mapDocsFromFindAll, this);
+
     this._handlePushSuccess = __bind(this._handlePushSuccess, this);
 
     this._handlePullResults = __bind(this._handlePullResults, this);
+
+    this._parseAllFromRemote = __bind(this._parseAllFromRemote, this);
+
+    this._parseFromRemote = __bind(this._parseFromRemote, this);
 
     this._handlePullError = __bind(this._handlePullError, this);
 
@@ -915,7 +921,7 @@ Hoodie.RemoteStore = (function(_super) {
       return defer;
     }
     path = "/" + encodeURIComponent("" + type + "/" + id);
-    return this.request("GET", path);
+    return this.request("GET", path).pipe(this._parseFromRemote);
   };
 
   RemoteStore.prototype.findAll = function(type) {
@@ -943,9 +949,7 @@ Hoodie.RemoteStore = (function(_super) {
     }
     promise = this.request("GET", path);
     promise.fail(defer.reject);
-    promise.done(function(response) {
-      return defer.resolve(response.rows);
-    });
+    promise.pipe(this._mapDocsFromFindAll).pipe(this._parseAllFromRemote).done(defer.resolve);
     return defer.promise();
   };
 
@@ -1193,10 +1197,13 @@ Hoodie.RemoteStore = (function(_super) {
     }
   };
 
-  RemoteStore.prototype._parseFromPull = function(obj) {
+  RemoteStore.prototype._parseFromRemote = function(obj) {
     var id, _ref;
     id = obj._id || obj.id;
     delete obj._id;
+    if (this._prefix) {
+      id = id.replace(RegExp('^' + this._prefix + '/'), '');
+    }
     _ref = id.split(/\//), obj.$type = _ref[0], obj.id = _ref[1];
     if (obj.$createdAt) {
       obj.$createdAt = new Date(Date.parse(obj.$createdAt));
@@ -1211,14 +1218,14 @@ Hoodie.RemoteStore = (function(_super) {
     return obj;
   };
 
-  RemoteStore.prototype._parseFromPush = function(obj) {
-    var id, _ref;
-    id = obj._id || delete obj._id;
-    _ref = obj.id.split(/\//), obj.$type = _ref[0], obj.id = _ref[1];
-    obj._rev = obj.rev;
-    delete obj.rev;
-    delete obj.ok;
-    return obj;
+  RemoteStore.prototype._parseAllFromRemote = function(objects) {
+    var object, _i, _len, _results;
+    _results = [];
+    for (_i = 0, _len = objects.length; _i < _len; _i++) {
+      object = objects[_i];
+      _results.push(this._parseFromRemote(object));
+    }
+    return _results;
   };
 
   RemoteStore.prototype._handlePullResults = function(changes) {
@@ -1228,7 +1235,7 @@ Hoodie.RemoteStore = (function(_super) {
     _changedDocs = [];
     for (_i = 0, _len = changes.length; _i < _len; _i++) {
       doc = changes[_i].doc;
-      doc = this._parseFromPull(doc);
+      doc = this._parseFromRemote(doc);
       if (doc._deleted) {
         _destroyedDocs.push([
           doc, this.hoodie.my.store.destroy(doc.$type, doc.id, {
@@ -1292,6 +1299,12 @@ Hoodie.RemoteStore = (function(_super) {
       }
       return _results;
     };
+  };
+
+  RemoteStore.prototype._mapDocsFromFindAll = function(response) {
+    return response.rows.map(function(row) {
+      return row.doc;
+    });
   };
 
   return RemoteStore;
@@ -1979,10 +1992,14 @@ Hoodie.User = (function() {
   function User(hoodie) {
     var _this = this;
     this.hoodie = hoodie;
-    return function(userHash) {
-      return _this.hoodie.open("user/" + userHash + "/public", {
+    return function(userHash, options) {
+      if (options == null) {
+        options = {};
+      }
+      $.extend(options, {
         prefix: '$public'
       });
+      return _this.hoodie.open("user/" + userHash + "/public", options);
     };
   }
 

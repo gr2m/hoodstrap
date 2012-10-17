@@ -10,7 +10,7 @@ Hoodie.extend('hoodstrap', (function() {
     this._logHoodieEvents()
 
     // update store
-    this._displayStore()
+    this._displayLocalStore()
 
     // all about authentication and stuff
     this._hoodifyAccountBar()
@@ -87,47 +87,143 @@ Hoodie.extend('hoodstrap', (function() {
         module     = _ref[0]
         eventName  = [].slice.call(_ref, 1).join(':')
         time       = new Date().toTimeString().substring(0,8)
-        dataString = this._humanizeData(data);
-        optionsTag = options ? '<td>' + this._humanizeData(options) + '</td>' : ''
+        dataString = this.humanizeData(data);
+        optionsTag = options ? '<td>' + this.humanizeData(options) + '</td>' : ''
 
         this.$hoodieLogBody.prepend('<tr><td>'+time+'</td><td>'+module+'</td><td>'+eventName+'</td><td class="data">'+dataString+'</td></tr>') 
       }.bind(this)
     },
 
     // 
-    _displayStore: function() {
-      this.$hoodieStoreBody = $('.hoodie-store tbody')
-      if( this.$hoodieStoreBody.length === 0 ) return;
+    _displayLocalStore: function() {
+      new Store('my.store', this.hoodie.my.store, $('.hoodie-stores'))
 
-      this._bootstrapStore()
+      $('.hoodie-stores .add-store').click(function() {
+        new Store('user("'+this.hoodie.my.account.ownerHash+'")', this.hoodie.user(this.hoodie.my.account.ownerHash, {sync: true}), $('.hoodie-stores'))
+      }.bind(this));
+    },
+
+    humanizeData: function(data) {
+      switch (typeof data) {
+        case 'undefined':
+          return '<em>undefined</em>'
+        case 'string':
+        case 'number':
+        case 'boolean':
+          return data
+        case 'object':
+          if (Array.isArray(data)) {
+            return data.map(this.humanizeData).join(',')
+          } else {
+            var rows = []
+            for (var key in data) {
+              rows.push('<tr><th>' + key + ':</th><td>' + this.humanizeData(data[key]) + '</td></tr>')
+            }
+            return '<table>' + rows.join('') +  '</table>'
+          }
+      }
+    },
+    humanizeDataForEdit: function(data, indent) {
+      if (!indent) indent = ''
+      switch (typeof data) {
+        case 'undefined':
+          return ''
+        case 'string':
+        case 'number':
+        case 'boolean':
+          return data
+        case 'object':
+          if (Array.isArray(data)) {
+            return data.map(this.humanizeData).join(',')
+          } else {
+            var rows = []
+            for (var key in data) {
+              if (/^\$/.test(key) || key === 'id') continue
+              rows.push(indent + key + ': ' + this.humanizeDataForEdit(data[key], indent + '  '))
+            }
+            return rows.join('\n')
+          }
+      }
+    }
+  }
+
+  // Store module
+  function Store(name, store, $container) {
+    this.name       = name
+    this.nameId     = 'Store' + name.replace(/[^a-z0-9]/g, '')
+    this.store      = store
+    this.$container = $container
+
+    this.store.loadAll()
+    .done(this._bootstrap.bind(this))
+    .fail(function (error) {
+      alert("Sorry, but " + name + "could not be loaded")
+      alert(JSON.stringify(error, '', 2))
+    })
+  }
+
+  Store.prototype = {
+
+    // 
+    _bootstrap: function(objects) {
+      // add tab
+      this.$container.find('.stores.nav li:last-child').before('<li><a id="'+this.nameId+'Tab" href="#'+this.nameId+'" data-toggle="tab">'+this.name+'</a></li>')
+
+      // add table
+      this.$container.find('.stores.tab-content').append(
+        '<div class="tab-pane" id="'+this.nameId+'">' +
+        ' <table class="table table-condensed"> ' +
+        '   <thead> ' +
+        '     <tr> ' +
+        '       <th>type</th> ' +
+        '       <th>#</th> ' +
+        '       <th>rev</th> ' +
+        '       <th>created at</th> ' +
+        '       <th>updated at</th> ' +
+        '       <th>synced at</th> ' +
+        '       <th class="data">data</th> ' +
+        '     </tr> ' +
+        '   </thead> ' +
+        '   <tbody> ' +
+        '   </tbody> ' +
+        ' </table> ' +
+        ' <p> ' +
+        '   <button class="btn btn-primary" data-hoodie-action="store-create"><span class="icon-plus icon-white"></span> create</button> ' +
+        '   <button class="btn" data-hoodie-action="store-clear"><span class="icon-trash"></span> clear</button> ' +
+        ' </p> ' +
+        '</div>')
+
+      
+      this.$container.find('#'+this.nameId).data('store', this.store)
+      this.$storeBody = this.$container.find('tbody')
+      var html = ''
+      for (var i = 0; i < objects.length; i++) {
+        html += this._objectToHtml(objects[i])
+      }
+      this.$storeBody.append(html)
+      this.$container.find('#'+this.nameId+'Tab').tab('show')
       this._bindToStoreEvents()
     },
 
     // 
-    _bootstrapStore: function() {
-      this.hoodie.my.store.loadAll().done(function(origObjects) {
-        var html = ''
-        for (var i = 0; i < origObjects.length; i++) {
-          html += this._objectToHtml(origObjects[i])
-        }
-        this.$hoodieStoreBody.append(html)
+    _bindToStoreEvents: function() {
+      this.store.on('create', function(object) {
+        this.$storeBody.append(this._objectToHtml(object))
+      }.bind(this))
+      this.store.on('update', function(object) {
+        this._getElementFor(object).replaceWith(this._objectToHtml(object))
+      }.bind(this))
+      this.store.on('destroy', function(object) {
+        this._getElementFor(object).remove()
+      }.bind(this))
+      this.store.on('clear', function(object) {
+        this.$storeBody.html('')
       }.bind(this))
     },
 
     // 
-    _bindToStoreEvents: function() {
-      this.hoodie.my.store.on('create', function(object) {
-        this.$hoodieStoreBody.append(this._objectToHtml(object))
-      }.bind(this))
-      this.hoodie.my.store.on('update', function(object) {
-        this._getElementFor(object).replaceWith(this._objectToHtml(object))
-      }.bind(this))
-      this.hoodie.my.store.on('destroy', function(object) {
-        this._getElementFor(object).remove()
-      }.bind(this))
-      this.hoodie.my.store.on('clear', function(object) {
-        this.$hoodieStoreBody.html('')
-      }.bind(this))
+    _getElementFor: function(object) {
+      return $('[data-hoodie-store-key="'+object.$type+'/'+object.id+'"]')
     },
 
     // 
@@ -153,57 +249,10 @@ Hoodie.extend('hoodstrap', (function() {
       createdAt = createdAt ? createdAt.toISOString().substring(0,19).replace('T', ' ') : '-'
       updatedAt = updatedAt ? updatedAt.toISOString().substring(0,19).replace('T', ' ') : '-'
       syncedAt  =  syncedAt ?  syncedAt.toISOString().substring(0,19).replace('T', ' ') : '-'
-      data      = this._humanizeData(properties)
-      editData  = this._humanizeDataForEdit(properties)
+      data      = Hoodstrap.prototype.humanizeData(properties)
+      editData  = Hoodstrap.prototype.humanizeDataForEdit(properties)
       actions   = '<a href="#" data-hoodie-action="store-edit" class="icon-pencil"></a><br><a href="#" data-hoodie-action="store-destroy" class="icon-trash"></a>'
       return '<tr data-hoodie-store-key="'+type+'/'+id+'"><td>'+type+'</td><td>'+id+'</td><td>'+rev+'</td><td>'+createdAt+'</td><td>'+updatedAt+'</td><td>'+syncedAt+'</td><td class="data">'+data+'</td><td class="actions">'+actions+'</td></tr>'  
-    },
-
-    _getElementFor: function(object) {
-      return $('[data-hoodie-store-key="'+object.$type+'/'+object.id+'"]')
-    },
-
-    _humanizeData: function(data) {
-      switch (typeof data) {
-        case 'undefined':
-          return '<em>undefined</em>'
-        case 'string':
-        case 'number':
-        case 'boolean':
-          return data
-        case 'object':
-          if (Array.isArray(data)) {
-            return data.map(this._humanizeData).join(',')
-          } else {
-            var rows = []
-            for (var key in data) {
-              rows.push('<tr><th>' + key + ':</th><td>' + this._humanizeData(data[key]) + '</td></tr>')
-            }
-            return '<table>' + rows.join('') +  '</table>'
-          }
-      }
-    },
-    _humanizeDataForEdit: function(data, indent) {
-      if (!indent) indent = ''
-      switch (typeof data) {
-        case 'undefined':
-          return ''
-        case 'string':
-        case 'number':
-        case 'boolean':
-          return data
-        case 'object':
-          if (Array.isArray(data)) {
-            return data.map(this._humanizeData).join(',')
-          } else {
-            var rows = []
-            for (var key in data) {
-              if (/^\$/.test(key) || key === 'id') continue
-              rows.push(indent + key + ': ' + this._humanizeDataForEdit(data[key], indent + '  '))
-            }
-            return rows.join('\n')
-          }
-      }
     }
   }
 
@@ -253,6 +302,7 @@ Hoodie.extend('hoodstrap', (function() {
         case 'store-create':
         case 'store-edit':
           modal = $('#hoodieStoreModal')
+          modal.data('store', $element.closest('.tab-pane').data('store'))
           
           if (action === 'store-create') {
             modal.find('.store-create').show()
@@ -265,7 +315,7 @@ Hoodie.extend('hoodstrap', (function() {
           key   = $element.closest('[data-hoodie-store-key]').data('hoodie-store-key').split('/')
           hoodie.my.store.find(key[0], key[1])
           .done( function(object) {
-            data = hoodie.hoodstrap._humanizeDataForEdit(object)
+            data = hoodie.hoodstrap.humanizeDataForEdit(object)
 
             modal.find('.data').attr('rows', data.split(/\n/).length + 3).val(data)
             modal.find('.type').val(object.$type)
@@ -288,6 +338,7 @@ Hoodie.extend('hoodstrap', (function() {
         , id       = $form.find('input.id').val()
         , data     = $form.find('textarea.data').val()
         , attributes
+        , store
         , update   = {}
 
       switch(action) {
@@ -339,13 +390,18 @@ Hoodie.extend('hoodstrap', (function() {
           })
           break
         case 'store-update':
+          store = $form.closest('.modal').data('store')
           attributes = data.split(/\n/)
 
-          for (var i = 0, key_value; i < attributes.length; i++) {
-            key_value = attributes[i].split(/\s*:\s*/)
-            update[key_value[0]] = key_value[1]
-          };
-          hoodie.my.store.update(type, id, update)
+          for (var i = 0, key, value; i < attributes.length; i++) {
+            key   = attributes[i].split(/\s*:\s*/)[0]
+            value = attributes[i].split(/\s*:\s*/)[1]
+            if(value === 'true') value = true
+            if(value === 'false') value = false
+            if(value == parseFloat(value)) value = parseFloat(value)
+            update[key] = value
+          }
+          store.update(type, id, update)
           .done(function() { 
             $form.find('.alert').remove()
             $(event.currentTarget).closest('.modal').modal('hide')
