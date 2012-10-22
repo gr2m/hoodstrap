@@ -39,9 +39,9 @@
                   <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                  <li><a href="#hoodieAccountModal" data-toggle="modal" class="hoodie-destroy" data-hoodie-action="account-changepassword">Change Password</a></li>
-                  <li><a href="#hoodieAccountModal" data-toggle="modal" class="hoodie-change-username" data-hoodie-action="account-changeusername">Change Username</a></li>
-                  <li><a href="#" class="hoodie-destroy" data-hoodie-action="account-destory">Destroy Account</a></li>
+                  <li><a href="#hoodieAccountModal" data-toggle="modal" data-hoodie-action="account-changepassword">Change Password</a></li>
+                  <li><a href="#hoodieAccountModal" data-toggle="modal" data-hoodie-action="account-changeusername">Change Username</a></li>
+                  <li><a href="#" data-hoodie-action="account-destroy">Destroy Account</a></li>
                 </ul>
               </span>
             </div><!-- /.hoodie-signed-out -->
@@ -81,7 +81,7 @@
 
       <hr>
 
-      <!-- magic hoodie modules -->
+      
       <div class="hoodie-stores">
         <h2>
           Stores
@@ -89,21 +89,141 @@
 
         <ul class="stores nav nav-tabs">
           <li>
-            <button class="add-store btn btn-small"><i class="icon-plus"></i></button>
+            <button class="add-public-user-store btn btn-small"><i class="icon-plus"></i> public user store</button>
+            <button class="add-share btn btn-small"><i class="icon-plus"></i> shared store</button>
           </li>
         </ul>
 
         <div class="stores tab-content">
         </div>
       </div>
-      <!-- /magic hoodie modules -->
-
+      
       <hr>
 
-      <!-- magic hoodie modules -->
+      <div class="hoodie-shares">
+        <h2>
+          Shares <small>(to be done)</small>
+        </h2>
+
+        <table class="table table-condensed">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>rev</th>
+              <th>created at</th>
+              <th>updated at</th>
+              <th>synced at</th>
+              <th>access</th>
+              <th>password</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+        <p>    
+          <button class="btn btn-primary" data-hoodie-action="share-create"><span class="icon-plus icon-white"></span> create</button>    
+          <button class="btn" data-hoodie-action="share-clear"><span class="icon-trash"></span> clear</button>  
+        </p>
+      </div>
+      
+      <hr>
+
+      <div class="hoodie-stores">
+        <h2>
+          E-Mail <small>(to be done)</small>
+        </h2>
+
+        <ul class="nav nav-tabs">
+          <li class="active">
+            <a href="#hoodieEmailCompose" data-toggle="tab">Compose</a>
+          </li>
+          <li><a href="#hoodieEmailOutbox" data-toggle="tab">Outbox</a></li>
+          <li><a href="#hoodieEmailSent" data-toggle="tab">Sent</a></li>
+        </ul>
+
+        <div class="tab-content">
+          <div class="tab-pane active" id="hoodieEmailCompose">
+            <form class="form-horizontal">
+              <div class="control-group">
+                <label class="control-label" for="inputFrom">From</label>
+                <div class="controls">
+                  <input type="text" id="inputFrom" placeholder="Email" class="span6">
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label" for="inputTo">To</label>
+                <div class="controls">
+                  <input type="text" id="inputTo" placeholder="Email" class="span6">
+                </div>
+              </div>
+              <div class="tabbable tabs-below">
+                <div class="tab-content">
+                  <div class="tab-pane active" id="hoodieEmailLessFields"></div>
+                  <div class="tab-pane" id="hoodieEmailMoreFields">
+                    <div class="control-group">
+                      <label class="control-label" for="inputCc">Cc</label>
+                      <div class="controls">
+                        <input type="text" id="inputCc" placeholder="Email" class="span6">
+                      </div>
+                    </div>
+                    <div class="control-group">
+                      <label class="control-label" for="inputBcc">Bcc</label>
+                      <div class="controls">
+                        <input type="text" id="inputBcc" placeholder="Email" class="span6">
+                      </div>
+                    </div>
+                    <div class="control-group">
+                      <label class="control-label" for="inputHeaders">Headers</label>
+                      <div class="controls">
+                        <textarea id="inputHeaders" class="span6" rows="2"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <ul class="controls nav nav-tabs">
+                  <li class="active"><a href="#hoodieEmailLessFields" data-toggle="tab">less</a></li>
+                  <li><a href="#hoodieEmailMoreFields" data-toggle="tab">more</a></li>
+                </ul>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label tabbable tabs-left" for="EmailBodyText">
+                  <ul class="nav nav-tabs">
+                    <li class="active"><a href="#EmailBodyText" data-toggle="tab">Text</a></li>
+                    <li><a href="#EmailBodyHtml" data-toggle="tab">HTML</a></li>
+                  </ul>
+                </label>
+                <div class="controls tab-content">
+                  <textarea id="EmailBodyText" class="span6 tab-pane active" rows="5">Hey there,
+
+how are you doing?</textarea>
+                  <textarea id="EmailBodyHtml" class="span6 tab-pane" rows="5"><h1>Hey there!</h1>
+
+<p>how are you doing?</p></textarea>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save changes</button>
+                <button type="button" class="btn">Cancel</button>
+              </div>
+            </form>
+          </div>
+          <div class="tab-pane" id="hoodieEmailOutbox">
+            <h3>Outbox</h3>
+            <p>to be done.</p>
+          </div>
+          <div class="tab-pane" id="hoodieEmailSent">
+            <h3>Sent</h3>
+            <p>to be done.</p>
+          </div>
+        </div>
+      </div>
+      
+      <hr>
+
       <div class="hoodie-log">
         <h2>
-          hoodie.log
+          Log
           <small>(<a href="#" class="clear">clear</a>)</small>
         </h2>
         <table class="table table-condensed">
@@ -120,7 +240,7 @@
           </tbody>
         </table>
       </div>
-      <!-- /magic hoodie modules -->
+      
       
 
       <hr>

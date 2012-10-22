@@ -6,17 +6,63 @@ Hoodie.extend('hoodstrap', (function() {
 
     this.hoodie = hoodie
 
-    // setup logging
-    this._logHoodieEvents()
+    // all about authentication and stuff
+    this._hoodifyAccountBar()
 
     // update store
     this._displayLocalStore()
 
-    // all about authentication and stuff
-    this._hoodifyAccountBar()
+    // update store
+    this._displayShares()
+
+    // setup logging
+    this._logHoodieEvents()
   }
 
   Hoodstrap.prototype = {
+
+    humanizeData: function(data) {
+      switch (typeof data) {
+        case 'undefined':
+          return '<em>undefined</em>'
+        case 'string':
+        case 'number':
+        case 'boolean':
+          return data
+        case 'object':
+          if (Array.isArray(data)) {
+            return data.map(this.humanizeData).join(',')
+          } else {
+            var rows = []
+            for (var key in data) {
+              rows.push('<tr><th>' + key + ':</th><td>' + this.humanizeData(data[key]) + '</td></tr>')
+            }
+            return '<table>' + rows.join('') +  '</table>'
+          }
+      }
+    },
+    humanizeDataForEdit: function(data, indent) {
+      if (!indent) indent = ''
+      switch (typeof data) {
+        case 'undefined':
+          return ''
+        case 'string':
+        case 'number':
+        case 'boolean':
+          return data
+        case 'object':
+          if (Array.isArray(data)) {
+            return data.map(this.humanizeData).join(',')
+          } else {
+            var rows = []
+            for (var key in data) {
+              if (/^\$/.test(key) || key === 'id') continue
+              rows.push(indent + key + ': ' + this.humanizeDataForEdit(data[key], indent + '  '))
+            }
+            return rows.join('\n')
+          }
+      }
+    },
 
     // 
     _hoodifyAccountBar: function() {
@@ -98,52 +144,73 @@ Hoodie.extend('hoodstrap', (function() {
     _displayLocalStore: function() {
       new Store('my.store', this.hoodie.my.store, $('.hoodie-stores'))
 
-      $('.hoodie-stores .add-store').click(function() {
-        new Store('user("'+this.hoodie.my.account.ownerHash+'")', this.hoodie.user(this.hoodie.my.account.ownerHash, {sync: true}), $('.hoodie-stores'))
+      $('.hoodie-stores .add-public-user-store').click(function() {
+        var userHash = prompt("userHash", this.hoodie.my.account.ownerHash)
+        if (! userHash) return
+        new Store('user("'+userHash+'")', this.hoodie.user(userHash, {sync: true}), $('.hoodie-stores'))
+      }.bind(this));
+
+      $('.hoodie-stores .add-share').click(function() {
+        var shareId = prompt("share ID")
+        if (! shareId) return
+        new Store('share("'+shareId+'")', this.hoodie.share(shareId, {sync: true}), $('.hoodie-stores'))
       }.bind(this));
     },
 
-    humanizeData: function(data) {
-      switch (typeof data) {
-        case 'undefined':
-          return '<em>undefined</em>'
-        case 'string':
-        case 'number':
-        case 'boolean':
-          return data
-        case 'object':
-          if (Array.isArray(data)) {
-            return data.map(this.humanizeData).join(',')
-          } else {
-            var rows = []
-            for (var key in data) {
-              rows.push('<tr><th>' + key + ':</th><td>' + this.humanizeData(data[key]) + '</td></tr>')
-            }
-            return '<table>' + rows.join('') +  '</table>'
-          }
-      }
+    // 
+    _displayShares: function() {
+      this.$shareBody = $('.hoodie-shares tbody')
+
+      this.hoodie.share.findAll()
+      .done(function(shares) {
+        var html = '';
+        for (var i = 0; i < shares.length; i++) {
+          html += this._shareToHtml(shares[i])
+        }
+        this.$shareBody.append(html)
+      }.bind(this))
+      .fail(function(error) {
+        alert('Could not load shares, because: ' + error)
+      })
+
+      this.hoodie.my.store.on('create:$share', function(object) {
+        this.$shareBody.append(this._shareToHtml(object))
+        console.log('create')
+      }.bind(this))
+      this.hoodie.my.store.on('update:$share', function(object) {
+        this._getElementFor(object).replaceWith(this._shareToHtml(object))
+      }.bind(this))
+      this.hoodie.my.store.on('destroy:$share', function(object) {
+        this._getElementFor(object).remove()
+      }.bind(this))
+      this.hoodie.my.store.on('clear', function(object) {
+        this.$shareBody.html('')
+      }.bind(this))
     },
-    humanizeDataForEdit: function(data, indent) {
-      if (!indent) indent = ''
-      switch (typeof data) {
-        case 'undefined':
-          return ''
-        case 'string':
-        case 'number':
-        case 'boolean':
-          return data
-        case 'object':
-          if (Array.isArray(data)) {
-            return data.map(this.humanizeData).join(',')
-          } else {
-            var rows = []
-            for (var key in data) {
-              if (/^\$/.test(key) || key === 'id') continue
-              rows.push(indent + key + ': ' + this.humanizeDataForEdit(data[key], indent + '  '))
-            }
-            return rows.join('\n')
-          }
-      }
+
+    _getElementFor: function(object) {
+      return $('[data-hoodie-store-key="'+object.$type+'/'+object.id+'"]')
+    },
+
+    _shareToHtml: function(share) {
+      var type        = '$share'
+        , id          = share.id
+        , rev         = share._rev || '-'
+        , createdAt   = share.$createdAt
+        , updatedAt   = share.$updatedAt
+        , syncedAt    = share._$syncedAt
+        , access      = share.access || '-' 
+        , password    =share.password || '-'
+           
+      if (typeof access === 'object')
+        access = JSON.stringify(access, '', 2)
+
+      // stringify dates
+      createdAt   = createdAt ? createdAt.toISOString().substring(0,19).replace('T', ' ') : '-'
+      updatedAt   = updatedAt ? updatedAt.toISOString().substring(0,19).replace('T', ' ') : '-'
+      syncedAt    =  syncedAt ?  syncedAt.toISOString().substring(0,19).replace('T', ' ') : '-'
+      
+      return'<tr data-hoodie-store-key="'+type+'/'+id+'"><td>'+id+'</td><td>'+rev+'</td><td>'+createdAt+'</td><td>'+updatedAt+'</td><td>'+syncedAt+'</td><td class="data">'+access+'</td><td>'+password+'</td><td class="actions">'+actions+'</td></tr>'  
     }
   }
 
@@ -225,7 +292,7 @@ Hoodie.extend('hoodstrap', (function() {
     },
 
     _updateCount: function() {
-      this.$container.find('.count').text( this.store.db.length() )
+      this.$container.find('.count').text( '?' )
     },
 
     // 
@@ -331,7 +398,16 @@ Hoodie.extend('hoodstrap', (function() {
           });
           
           break
+        case 'share-create':
+          hoodie.share.create()
+          break
+        case 'share-clear':
+          if (! confirm('Are you sure?')) return
+
+          hoodie.share.destroyAll()
       }
+
+      // event.preventDefault()
     })
 
     // bind to form submits

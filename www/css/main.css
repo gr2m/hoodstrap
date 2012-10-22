@@ -1,11 +1,13 @@
-
+body {
+  padding-bottom: 800px;
+}
 
 /* ==========================================================================
    Hoodie Sign In / Sign Up / Sign out stylings
    ========================================================================== */
 
 .hoodie-accountbar {
-
+  
 }
 
 /* hide contents until we know if user is signed in or not */
