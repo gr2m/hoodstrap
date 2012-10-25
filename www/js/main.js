@@ -13,7 +13,7 @@ $('#changeHoodieBaseUrl').click(function(event) {
   localStorage.setItem('baseUrl', prompt("enter hoodie base URL", defaultHostname))
 
   reload = function() { location.reload() };
-  hoodie.my.account.signOut()
+  hoodie.account.signOut()
     .done( reload )
     .fail( reload )
 })
@@ -28,6 +28,6 @@ $hoodieAccountModal = $('#hoodieAccountModal')
 })
 
 // 
-hoodie.my.account.on('signin signup passwordreset', function() {
+hoodie.account.on('signin signup passwordreset', function() {
   $hoodieAccountModal.modal('hide')
 });

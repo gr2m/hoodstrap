@@ -67,10 +67,10 @@ Hoodie.extend('hoodstrap', (function() {
     // 
     _hoodifyAccountBar: function() {
       this.$hoodieAccountBar = $('.hoodie-accountbar')
-      this.hoodie.my.account.authenticate().then(this._handleUserAuthenticated.bind(this), this._handleUserUnauthenticated.bind(this));
+      this.hoodie.account.authenticate().then(this._handleUserAuthenticated.bind(this), this._handleUserUnauthenticated.bind(this));
 
-      this.hoodie.my.account.on('signin', this._handleUserAuthenticated.bind(this))
-      this.hoodie.my.account.on('signout', this._handleUserUnauthenticated.bind(this))
+      this.hoodie.account.on('signin', this._handleUserAuthenticated.bind(this))
+      this.hoodie.account.on('signout', this._handleUserUnauthenticated.bind(this))
       this.hoodie.on('account:error:unauthenticated remote:error:unauthenticated', this._handleUserAuthenticationError.bind(this))
     },
 
@@ -86,7 +86,7 @@ Hoodie.extend('hoodstrap', (function() {
     },
     _handleUserAuthenticationError: function() {
       alert("Authentication Error. Please Sign In again.")
-      this.$hoodieAccountBar.find('.hoodie-username').text(this.hoodie.my.account.username)
+      this.$hoodieAccountBar.find('.hoodie-username').text(this.hoodie.account.username)
       $('html').attr('data-hoodie-account-status', 'error')
     },
 
@@ -94,7 +94,7 @@ Hoodie.extend('hoodstrap', (function() {
     _logHoodieEvents: function() {
       this.$hoodieLogBody = $('.hoodie-log tbody')
 
-      var remotePrefix = this.hoodie.my.remote.name + ':',
+      var remotePrefix = this.hoodie.remote.name + ':',
           events = [
             'account:signin',
             'account:signup',
@@ -142,10 +142,10 @@ Hoodie.extend('hoodstrap', (function() {
 
     // 
     _displayLocalStore: function() {
-      new Store('my.store', this.hoodie.my.store, $('.hoodie-stores'))
+      new Store('store', this.hoodie.store, $('.hoodie-stores'))
 
       $('.hoodie-stores .add-public-user-store').click(function() {
-        var userHash = prompt("userHash", this.hoodie.my.account.ownerHash)
+        var userHash = prompt("userHash", this.hoodie.account.ownerHash)
         if (! userHash) return
         new Store('user("'+userHash+'")', this.hoodie.user(userHash, {sync: true}), $('.hoodie-stores'))
       }.bind(this));
@@ -173,17 +173,17 @@ Hoodie.extend('hoodstrap', (function() {
         alert('Could not load shares, because: ' + error)
       })
 
-      this.hoodie.my.store.on('create:$share', function(object) {
+      this.hoodie.store.on('create:$share', function(object) {
         this.$shareBody.append(this._shareToHtml(object))
         console.log('create')
       }.bind(this))
-      this.hoodie.my.store.on('update:$share', function(object) {
+      this.hoodie.store.on('update:$share', function(object) {
         this._getElementFor(object).replaceWith(this._shareToHtml(object))
       }.bind(this))
-      this.hoodie.my.store.on('destroy:$share', function(object) {
+      this.hoodie.store.on('destroy:$share', function(object) {
         this._getElementFor(object).remove()
       }.bind(this))
-      this.hoodie.my.store.on('clear', function(object) {
+      this.hoodie.store.on('clear', function(object) {
         this.$shareBody.html('')
       }.bind(this))
     },
@@ -353,7 +353,7 @@ Hoodie.extend('hoodstrap', (function() {
       
       switch(action) {
         case 'account-signout':
-          window.hoodie.my.account.signOut()
+          window.hoodie.account.signOut()
           .fail(function(error) { 
             alert("Ooops, something went wrong");
           })
@@ -361,17 +361,17 @@ Hoodie.extend('hoodstrap', (function() {
         case 'account-destroy':
           if(! confirm("you sure? Destroy account with all its data?")) return;
 
-          window.hoodie.my.account.destroy()
+          window.hoodie.account.destroy()
           .fail(function(error) { 
             alert("Ooops, something went wrong");
           })
           break
         case 'store-clear':
-          if(confirm('you sure?')) hoodie.my.store.clear()
+          if(confirm('you sure?')) hoodie.store.clear()
           break
         case 'store-destroy':
           key   = $element.closest('[data-hoodie-store-key]').data('hoodie-store-key').split('/')
-          hoodie.my.store.destroy(key[0], key[1])
+          hoodie.store.destroy(key[0], key[1])
           break
         case 'store-create':
         case 'store-edit':
@@ -387,7 +387,7 @@ Hoodie.extend('hoodstrap', (function() {
 
           modal.find('.store-create').hide()
           key   = $element.closest('[data-hoodie-store-key]').data('hoodie-store-key').split('/')
-          hoodie.my.store.find(key[0], key[1])
+          hoodie.store.find(key[0], key[1])
           .done( function(object) {
             data = hoodie.hoodstrap.humanizeDataForEdit(object)
 
@@ -426,7 +426,7 @@ Hoodie.extend('hoodstrap', (function() {
 
       switch(action) {
         case 'account-signin':
-          hoodie.my.account.signIn(username, password)
+          hoodie.account.signIn(username, password)
           .done(function() { 
             $form.find('.alert').remove()
           })
@@ -435,7 +435,7 @@ Hoodie.extend('hoodstrap', (function() {
           })
           break
         case 'account-signup':
-          hoodie.my.account.signUp(username, password)
+          hoodie.account.signUp(username, password)
           .done(function() { 
             $form.find('.alert').remove()
           })
@@ -444,7 +444,7 @@ Hoodie.extend('hoodstrap', (function() {
           })
           break
         case 'account-changepassword':
-          hoodie.my.account.changePassword(null, password)
+          hoodie.account.changePassword(null, password)
           .done(function() { 
             $form.find('.alert').remove()
           })
@@ -453,7 +453,7 @@ Hoodie.extend('hoodstrap', (function() {
           })
           break
         case 'account-changeusername':
-          hoodie.my.account.changeUsername(password, username)
+          hoodie.account.changeUsername(password, username)
           .done(function() { 
             $form.find('.alert').remove()
           })
@@ -463,7 +463,7 @@ Hoodie.extend('hoodstrap', (function() {
           //
           break
         case 'account-resetpassword':
-          hoodie.my.account.resetPassword(email)
+          hoodie.account.resetPassword(email)
           .done(function() {
             alert("send new password to " + email)
             $form.find('.alert').remove()
