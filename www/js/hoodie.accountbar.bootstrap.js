@@ -221,7 +221,7 @@ Hoodie.extend('hoodstrap', (function() {
     this.store      = store
     this.$container = $container
 
-    this.store.loadAll()
+    this.store.findAll()
     .done(this._bootstrap.bind(this))
     .fail(function (error) {
       alert("Sorry, but " + name + "could not be loaded")
